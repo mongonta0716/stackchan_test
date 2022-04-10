@@ -44,7 +44,6 @@ int servo_offset_y = 0; // Y軸サーボオフセット（90°からの+-）
 #define WIFI_SECONDORY_CHANNEL 2
 
 char *json_buffer;
-StackchanESPNOW espnow_data;
 StackchanSERVO  servo;
 
 bool random_mode = false;
@@ -53,7 +52,6 @@ bool game_mode = false;
 const char* lyrics[] = { "BtnA:GameMode  ", "BtnB:TestMotion  ", "BtnC:RandomMode  "};
 const int lyrics_size = sizeof(lyrics) / sizeof(char*);
 int lyrics_idx = 0;
-
 
 uint8_t randomMove() {
   int direction = random(4);
@@ -104,22 +102,11 @@ void startTasks() {
                        tskNO_AFFINITY);
 }
 
-// ESP-NOWを受信したときに実行されるコールバック関数です。
-void onRecvData(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
-  // ログを画面表示したい場合は排他をかけないと失敗する場合あり
-  Serial.println("onRecvData");
-  char macStr[18];
-  snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
-      mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
-  
-  //char buf[250] = "";
-  //memcpy(&buf, data, data_len);
-  //Serial.printf("%s\n", buf);
-  espnow_data.deserializeJSON(data, data_len);
-  //espnow_data.printAllParameters();
+
+void callFromOnRecvDataStackchanESPNOW() {
   avatar.setExpression((Expression)espnow_data.getExpression());
-  servo.moveXY(90, 75, 500);
   servo.motion((Motion)espnow_data.getMotion());
+  
 }
 
 
@@ -178,7 +165,6 @@ void setup() {
   } else {
     Serial.println("esp now init failed");
   }
-  esp_now_register_recv_cb(onRecvData);
 
 
   avatar.init();

@@ -49,6 +49,11 @@ void StackchanSERVO::moveX(int x, uint32_t millis_for_move) {
   }
 }
 
+void StackchanSERVO::moveX(servo_param_s servo_param_x) {
+  _init_param.x.offset = servo_param_x.offset;
+  moveX(servo_param_x.degree, servo_param_x.millis_for_move);
+}
+
 void StackchanSERVO::moveY(int y, uint32_t millis_for_move) {
   if (millis_for_move == 0) {
     _servo_y.easeTo(y + _init_param.y.offset);
@@ -57,9 +62,23 @@ void StackchanSERVO::moveY(int y, uint32_t millis_for_move) {
   }
 }
 
+void StackchanSERVO::moveY(servo_param_s servo_param_y) {
+  _init_param.y.offset = servo_param_y.offset;
+  moveX(servo_param_y.degree, servo_param_y.millis_for_move);
+}
 void StackchanSERVO::moveXY(int x, int y, uint32_t millis_for_move) {
   _servo_x.setEaseToD(x + _init_param.x.offset, millis_for_move);
   _servo_y.setEaseToD(y + _init_param.y.offset, millis_for_move);
+  synchronizeAllServosStartAndWaitForAllServosToStop();
+}
+
+void StackchanSERVO::moveXY(servo_param_s servo_param_x, servo_param_s servo_param_y) {
+  if (servo_param_x.degree != 0) {
+    _servo_x.setEaseToD(servo_param_x.degree + servo_param_x.offset, servo_param_x.millis_for_move);
+  }
+  if (servo_param_y.degree != 0) {
+    _servo_y.setEaseToD(servo_param_y.degree + servo_param_y.offset, servo_param_y.millis_for_move);
+  }
   synchronizeAllServosStartAndWaitForAllServosToStop();
 }
 

@@ -16,16 +16,18 @@ enum Motion {
 
 
 
-typedef struct ServoInitialParam {
-    int servo_pin;
-    int8_t start_degree;
-    int8_t offset;
-} servo_initial_param_s;
+typedef struct ServoParam {
+    int servo_pin;                    // サーボのピン番号
+    int8_t start_degree;              // 初期角度
+    int8_t offset;                    // オフセット（90°からの+-）
+    int8_t degree;                    // 角度
+    uint32_t millis_for_move;         // 移動時間(msec)
+} servo_param_s;
 
 
 typedef struct  StackchanServo{
-    servo_initial_param_s x;
-    servo_initial_param_s y;
+    servo_param_s x;
+    servo_param_s y;
 } stackchan_servo_initial_param_s;
 
 class StackchanSERVO {
@@ -43,6 +45,9 @@ class StackchanSERVO {
         void moveX(int x, uint32_t millis_for_move = 0);
         void moveY(int y, uint32_t millis_for_move = 0);
         void moveXY(int x, int y, uint32_t millis_for_move);
+        void moveX(servo_param_s servo_param_x);
+        void moveY(servo_param_s servo_param_y);
+        void moveXY(servo_param_s servo_param_x, servo_param_s servo_param_y);
         void motion(Motion motion_no);
 };
 
