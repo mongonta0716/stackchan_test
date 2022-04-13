@@ -104,9 +104,8 @@ void startTasks() {
 
 
 void callFromOnRecvDataStackchanESPNOW() {
-  avatar.setExpression((Expression)espnow_data.getExpression());
-  servo.motion((Motion)espnow_data.getMotion());
-  
+  avatar.setExpression((Expression)STACKC_ESPNOW.getExpression());
+  servo.motion((Motion)STACKC_ESPNOW.getMotion());
 }
 
 
@@ -166,9 +165,9 @@ void setup() {
     Serial.println("esp now init failed");
   }
 
-
+  STACKC_ESPNOW.begin();
   avatar.init();
-
+  
   servo.begin(SERVO_PIN_X, START_DEGREE_VALUE_X, servo_offset_x,
               SERVO_PIN_Y, START_DEGREE_VALUE_Y, servo_offset_y);
 
