@@ -17,11 +17,11 @@ extern void callFromOnRecvDataStackchanESPNOW();
 
 
 typedef struct ESPNOWData {
-    uint8_t motion;              // モーション番号（enum Motion）
-    uint8_t expression;          // 表情番号(enum Expression)
-    String aqtalk;               // Aquestalk用の文字列
-    servo_param_s x;             // X軸サーボのパラメータ
-    servo_param_s y;             // Y軸サーボのパラメータ
+    uint8_t motion;                    // モーション番号（enum Motion）
+    uint8_t expression;                // 表情番号(enum Expression)
+    String aqtalk;                     // Aquestalk用の文字列
+    servo_param_s x;                   // X軸サーボのパラメータ
+    servo_param_s y;                   // Y軸サーボのパラメータ
 } espnow_data_s;
 
 typedef void (*stackchanESPNOWCallback)(espnow_data_s *stackchan_params);

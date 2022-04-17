@@ -53,9 +53,9 @@ void StackchanESPNOW::deserializeJSON() {
         Serial.println(error.c_str());
         return;
     }
-    _data.aqtalk = doc[0]["aqtalk"].as<String>();
-    _data.motion = doc[1]["motion"];
-    _data.expression = doc[2]["expression"];
+    _data.aqtalk = doc["aqtalk"].as<String>();
+    _data.motion = doc["motion"];
+    _data.expression = doc["expression"];
     
 }
 
