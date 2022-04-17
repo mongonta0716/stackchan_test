@@ -103,9 +103,9 @@ void startTasks() {
 }
 
 
-void callFromOnRecvDataStackchanESPNOW() {
-  avatar.setExpression((Expression)STACKC_ESPNOW.getExpression());
-  servo.motion((Motion)STACKC_ESPNOW.getMotion());
+void callFromOnRecvDataStackchanESPNOW(espnow_data_s *stackchan_params) {
+  avatar.setExpression((Expression)stackchan_params->expression);
+  servo.motion((Motion)stackchan_params->motion);
 }
 
 
@@ -166,6 +166,7 @@ void setup() {
   }
 
   STACKC_ESPNOW.begin();
+  STACKC_ESPNOW.setOnRecieveCallback(callFromOnRecvDataStackchanESPNOW);
   avatar.init();
   
   servo.begin(SERVO_PIN_X, START_DEGREE_VALUE_X, servo_offset_x,

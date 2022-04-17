@@ -24,6 +24,8 @@ typedef struct ESPNOWData {
     servo_param_s y;             // Y軸サーボのパラメータ
 } espnow_data_s;
 
+typedef void (*stackchanESPNOWCallback)(espnow_data_s *stackchan_params);
+
 class StackchanESPNOW {
     private:
         String command;          // 制御用のコマンド
@@ -31,6 +33,7 @@ class StackchanESPNOW {
         espnow_data_s _data;     // データ本体
         int last_buffer_length;
         uint8_t *_espnow_buffer;
+        stackchanESPNOWCallback _espnow_cb = nullptr;
     public:
         StackchanESPNOW();
         ~StackchanESPNOW();
@@ -45,6 +48,8 @@ class StackchanESPNOW {
         uint8_t *getESPNOWBuffer() { return _espnow_buffer; }
         void execESPNOWBuffer(const uint8_t *data, int data_len);
         void appendESPNOWBuffer(const uint8_t *data);
+        void setOnRecieveCallback(stackchanESPNOWCallback cb);
+    
 };
 
 extern StackchanESPNOW STACKC_ESPNOW;

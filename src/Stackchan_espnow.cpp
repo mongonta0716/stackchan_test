@@ -2,7 +2,7 @@
 
 
 extern void onRecvData(const uint8_t *mac_addr, const uint8_t *data, int data_len);
-
+/*
 #include <string>
 #include <cstdio>
 #include <vector>
@@ -14,7 +14,7 @@ std::string format(const std::string& fmt, Args ... args )
     snprintf(&buf[0], len + 1, fmt.c_str(), args ... );
     return std::string(&buf[0], &buf[0] + len);
 }
-
+*/
 
 static uint8_t espnow_buffer_index = 0;
 static uint16_t espnow_buffer_len = 0;
@@ -27,6 +27,10 @@ StackchanESPNOW::StackchanESPNOW() {
 
 StackchanESPNOW::~StackchanESPNOW() {
     free(_espnow_buffer);
+};
+
+void StackchanESPNOW::setOnRecieveCallback(stackchanESPNOWCallback cb) {
+  _espnow_cb = cb;
 };
 
 void StackchanESPNOW::begin() {
@@ -67,8 +71,11 @@ void StackchanESPNOW::execESPNOWBuffer(const uint8_t *data, int data_len) {
     deserializeJSON();
     espnow_buffer_index = 0;
     espnow_buffer_len = 0;
-    // main.cppに定義された処理を呼び出します。
-    callFromOnRecvDataStackchanESPNOW();
+    if (_espnow_cb != nullptr) {
+      // main.cppに定義された処理を呼び出します。
+      _espnow_cb(&_data);
+    }
+    //callFromOnRecvDataStackchanESPNOW();
 }
 
 void StackchanESPNOW::appendESPNOWBuffer(const uint8_t *data) {
@@ -99,11 +106,8 @@ const esp_now_peer_info_t * peer = &esp_ap;
 // ESP-NOWを受信したときに実行されるコールバック関数です。
 void onRecvData(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
   // ログを画面表示したい場合は排他をかけないと失敗する場合あり
-  Serial.println("onRecvData");
  char buf[250] = "";
   memcpy(&buf, data, data_len);
-  Serial.printf("RecvData:%s\n", buf);
-  Serial.printf("RecvLen :%d\n", data_len);
   // JSONの中にDATAENDの文字列が含まれた場合終了 
   char *ptr_ch;
   ptr_ch = strstr(buf, end_data);
@@ -117,17 +121,18 @@ void onRecvData(const uint8_t *mac_addr, const uint8_t *data, int data_len) {
     snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
         mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
     Serial.printf("MAC:%s\n", macStr);
-    Serial.println("peer");
     // 送信側に次のデータを要求
     for (int i=0; i<6; i++) {
         esp_ap.peer_addr[i] = mac_addr[i];
     }
-    esp_ap.channel = 8;
-    Serial.println("peer2");
     
-    ESP_ERROR_CHECK(esp_now_add_peer(&esp_ap));
-    ESP_ERROR_CHECK(esp_now_send(peer_addr, (const uint8_t*)send_data, strlen(send_data)));
-    ESP_ERROR_CHECK(esp_now_del_peer(peer_addr));
+    if (esp_now_add_peer(peer) != ESP_OK) {
+      Serial.println("add peer failure");
+    } else {
+      esp_now_send(peer_addr, (const uint8_t*)send_data, strlen(send_data));
+    }
+    esp_now_del_peer(peer_addr);
+    Serial.println("onRecvData out");
   }
 
   //espnow_data.printAllParameters();
